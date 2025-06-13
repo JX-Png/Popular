@@ -1,0 +1,138 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .header-container {
+        background-color: #ffe0e0; /* Light pink background */
+        padding: 10px 20px;
+        text-align: left;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        font-size: 2em;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .admin-login-link {
+        font-size: 0.9em;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .admin-login-link:hover {
+        text-decoration: underline;
+    }
+
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-top: 20px;
+    }
+
+    .icon-placeholder {
+        width: 150px;
+        height: 150px;
+        border: 2px solid black;
+        border-radius: 50%; /* Makes it a circle */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        font-size: 1.2em;
+        color: #666;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        width: 300px; /* Adjust as needed */
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Ensures padding doesn't affect overall width */
+    }
+
+    .login-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 300px; /* Match form-group width */
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-login {
+        background-color: #90ee90; /* Light green */
+        color: #333;
+        border: 1px solid #77cc77;
+    }
+
+    .btn-create-account {
+        background-color: #ffe0b2; /* Light orange/yellow */
+        color: #333;
+        border: 1px solid #ffcc80;
+    }
+
+    .forgot-password-link {
+        font-size: 0.9em;
+        color: #007bff;
+        text-decoration: none;
+        display: block; /* Makes it take its own line */
+        text-align: left; /* Aligns to the left of its container */
+        width: 300px; /* Match form-group width */
+        margin-bottom: 20px; /* Space before the buttons */
+    }
+
+    .forgot-password-link:hover {
+        text-decoration: underline;
+    }
+
+</style>
+
+<div class="header-container">
+    <div class="header-title">Popular Bookstore</div>
+    <a href="/AdminLogin" class="admin-login-link">Administrator Login</a>
+</div>
+
+<div class="login-container">
+    <div class="icon-placeholder">
+        Icon
+    </div>
+
+    <form method="post">
+        <div class="form-group">
+            <input type="email" class="form-control" id="email" name="Email" placeholder="Enter mail" required />
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" id="password" name="Password" placeholder="Enter Password" required />
+        </div>
+        <div>
+            <a href="#" class="forgot-password-link">Forget password?</a>
+        </div>
+        <div class="login-actions">
+            <button type="submit" class="btn btn-login">Login</button>
+            <a href="/CreateAccount" class="btn btn-create-account">Create Account</a>
+        </div>
+    </form>
+</div>
