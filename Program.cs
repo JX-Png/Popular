@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Logging;
 using PopularBookstore.Services;
-
-
+using WebApplication1.Data; // Assuming ApplicationDbContext is in this namespace
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,12 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-// Ensure a connection string is found
 if (string.IsNullOrEmpty(connectionString))
 {
-   
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.json. Please ensure it is configured correctly.");
 }
+
+// Register DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString)); // Ensure you're using the correct provider (e.g., UseSqlite, UseNpgsql)
 
 builder.Services.AddRazorPages(options =>
 {
@@ -28,10 +29,10 @@ builder.Services.AddTransient<IEmailSender, MessageSender>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Login"; // Path to login page
-        options.AccessDeniedPath = "/AccessDenied"; // Path to access denied page
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie expiration
-        options.SlidingExpiration = true; // Resets expiration on activity
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
     });
 
 var app = builder.Build();
@@ -39,12 +40,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error"); 
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 else
 {
-    app.UseDeveloperExceptionPage(); 
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
@@ -57,8 +58,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-
-
 app.Run();
 
-public partial class Program { } 
+public partial class Program { }
