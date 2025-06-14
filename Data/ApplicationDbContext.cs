@@ -1,7 +1,14 @@
-﻿namespace WebApplication1.Data
+﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Models; 
+
+namespace WebApplication1.Data 
 {
-    public class ApplicationDbContext
+    public class ApplicationDbContext : DbContext
     {
-        public object Database { get; internal set; }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+
+        public DbSet<Book> Books { get; set; } 
     }
 }
