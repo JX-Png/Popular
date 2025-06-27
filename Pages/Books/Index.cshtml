@@ -4,6 +4,9 @@
 @{
     ViewData["Title"] = "Books";
 }
+
+<partial name="_Header" />
+
 <h2>Books</h2>
 <p>
     <a asp-page="Create">Add New Book</a>
@@ -20,28 +23,28 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var book in Model.Books)
-    {
-        <tr>
-            <td>@book.Title</td>
-            <td>@book.Author</td>
-            <td>@book.Price.ToString("C")</td>
-            <td>@book.Genre</td>
-            <td>
-                @if (book.ImageData != null && book.ImageMimeType != null)
-                {
-                    <img src="data:@book.ImageMimeType;base64,@Convert.ToBase64String(book.ImageData)" alt="@book.Title" width="50" />
-                }
-                else if (!string.IsNullOrEmpty(book.ImageUrl))
-                {
-                    <img src="@book.ImageUrl" alt="@book.Title" width="50" />
-                }
-            </td>
-            <td>
-                <a asp-page="Edit" asp-route-id="@book.Id">Edit</a> |
-                <a asp-page="Delete" asp-route-id="@book.Id">Delete</a>
-            </td>
-        </tr>
-    }
+        @foreach (var book in Model.Books)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.Price.ToString("C")</td>
+                <td>@book.Genre</td>
+                <td>
+                    @if (book.ImageData != null && book.ImageMimeType != null)
+                    {
+                        <img src="data:@book.ImageMimeType;base64,@Convert.ToBase64String(book.ImageData)" alt="@book.Title" width="50" />
+                    }
+                    else if (!string.IsNullOrEmpty(book.ImageUrl))
+                    {
+                        <img src="@book.ImageUrl" alt="@book.Title" width="50" />
+                    }
+                </td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@book.Id">Edit</a> |
+                    <a asp-page="Delete" asp-route-id="@book.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
