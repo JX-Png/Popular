@@ -23,7 +23,9 @@ namespace WebApplication1.Models // Or PopularBookstore.Models if you've changed
         [StringLength(50)] 
         public string? Genre { get; set; } 
 
-        
-        // public string? CoverImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
+
+        public byte[]? ImageData { get; set; }
+        public string? ImageMimeType { get; set; }
     }
 }

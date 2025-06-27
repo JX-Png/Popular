@@ -1,0 +1,24 @@
+﻿@page "{id:int}"
+@model BooksDeleteModel
+@{
+    ViewData["Title"] = "Delete Book";
+}
+<h2>Delete Book</h2>
+<div>
+    <h4>Are you sure you want to delete this book?</h4>
+    <dl>
+        <dt>Title</dt>
+        <dd>@Model.Book.Title</dd>
+        <dt>Author</dt>
+        <dd>@Model.Book.Author</dd>
+        <dt>Price</dt>
+        <dd>@Model.Book.Price.ToString("C")</dd>
+        <dt>Genre</dt>
+        <dd>@Model.Book.Genre</dd>
+    </dl>
+    <form method="post">
+        <input type="hidden" asp-for="Book.Id" />
+        <button type="submit">Delete</button>
+        <a asp-page="Index">Cancel</a>
+    </form>
+</div>

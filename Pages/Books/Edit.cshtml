@@ -1,0 +1,40 @@
+﻿@page "{id:int}"
+@model BooksEditModel
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<h2>Edit Book</h2>
+<form method="post">
+    <input type="hidden" asp-for="Book.Id" />
+    <div>
+        <label asp-for="Book.Title"></label>
+        <input asp-for="Book.Title" />
+        <span asp-validation-for="Book.Title"></span>
+    </div>
+    <div>
+        <label asp-for="Book.Author"></label>
+        <input asp-for="Book.Author" />
+        <span asp-validation-for="Book.Author"></span>
+    </div>
+    <div>
+        <label asp-for="Book.Price"></label>
+        <input asp-for="Book.Price" type="number" step="0.01" />
+        <span asp-validation-for="Book.Price"></span>
+    </div>
+    <div>
+        <label asp-for="Book.Genre"></label>
+        <input asp-for="Book.Genre" />
+        <span asp-validation-for="Book.Genre"></span>
+    </div>
+    <div>
+        <label asp-for="Book.ImageUrl"></label>
+        <input asp-for="Book.ImageUrl" />
+        <span asp-validation-for="Book.ImageUrl"></span>
+    </div>
+    <button type="submit">Save</button>
+    <a asp-page="Index">Cancel</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

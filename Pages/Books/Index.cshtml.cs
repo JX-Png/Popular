@@ -5,22 +5,17 @@ using WebApplication1.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PopularBookstore.Pages
+namespace PopularBookstore.Pages.Books
 {
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-
-        public IndexModel(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public IndexModel(ApplicationDbContext context) => _context = context;
 
         public List<Book> Books { get; set; } = new();
 
         public async Task OnGetAsync()
         {
-            // Load all books (including the image data) from the database
             Books = await _context.Books.ToListAsync();
         }
     }

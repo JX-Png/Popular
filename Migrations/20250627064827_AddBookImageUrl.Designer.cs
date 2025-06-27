@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -10,9 +11,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627064827_AddBookImageUrl")]
+    partial class AddBookImageUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,12 +40,6 @@ namespace WebApplication1.Migrations
                     b.Property<string>("Genre")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<byte[]>("ImageData")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageMimeType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
