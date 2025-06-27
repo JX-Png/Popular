@@ -40,20 +40,14 @@ public class LoginModel : PageModel
         }
 
         // --- Mock Authentication ---
-        // In a real app, you'd validate against a database (e.g., using ASP.NET Core Identity)
-        // For now, let's assume the user created via "Create Account" was:
-        // Email: user@example.com (from your previous dummy check)
-        // Password: password (from your previous dummy check)
-        // OR a user you "created" via the CreateAccount page.
-        // Let's use a predefined user for simplicity here.
+      
         if (Input.Email == "test@example.com" && Input.Password == "Password123!")
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, Input.Email),
                 new Claim(ClaimTypes.Email, Input.Email),
-                // Add other claims as needed, e.g., roles
-                // new Claim(ClaimTypes.Role, "User"),
+
             };
 
             var claimsIdentity = new ClaimsIdentity(

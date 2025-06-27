@@ -6,98 +6,6 @@
 }
 
 <style>
-    .main-header-container {
-        background-color: #ffe0e0;
-        padding: 15px 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0;
-    }
-
-    .main-header-title {
-        font-size: 2.5em;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .cart-icon-area a {
-        font-size: 2.5em;
-        color: #555;
-        text-decoration: none;
-    }
-
-        .cart-icon-area a::before {
-            content: "🛒";
-        }
-
-    .nav-bar {
-        background-color: #f8f9fa;
-        padding: 10px 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .nav-links {
-        display: flex;
-        align-items: center;
-    }
-
-
-        .nav-links a,
-        .nav-links form button.nav-link-button {
-            margin-right: 20px;
-            text-decoration: none;
-            color: #007bff;
-            font-size: 1.1em;
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            font-family: inherit;
-            line-height: inherit;
-            vertical-align: middle;
-        }
-
-            .nav-links a:hover,
-            .nav-links form button.nav-link-button:hover {
-                text-decoration: underline;
-                color: #0056b3;
-            }
-
-        .nav-links form {
-            display: inline;
-            margin: 0;
-            padding: 0;
-        }
-
-    .search-bar-container {
-        display: flex;
-    }
-
-        .search-bar-container input[type="text"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            min-width: 250px;
-        }
-
-        .search-bar-container button {
-            padding: 8px 12px;
-            border: 1px solid #007bff;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 0 4px 4px 0;
-        }
-
-            .search-bar-container button:hover {
-                background-color: #0056b3;
-            }
-
     .book-gallery {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
@@ -179,32 +87,7 @@
 
 </style>
 
-<div class="main-header-container">
-    <div class="main-header-title">Popular Bookstore</div>
-    <div class="cart-icon-area">
-        <a asp-page="/Cart" title="View Cart"></a>
-    </div>
-</div>
-
-<nav class="nav-bar">
-    <div class="nav-links">
-        <a asp-page="/Index">Home</a>
-        <a asp-page="/Promotions">Promotions</a>
-        <a asp-page="/Profile">Profile</a>
-        <a asp-page="/Settings">Settings</a>
-        <a asp-page="/OrderHistory">Order History</a>
-        @if (User.Identity != null && User.Identity.IsAuthenticated)
-        {
-            <form asp-page="/Logout" method="post">
-                <button type="submit" class="nav-link-button">Logout</button>
-            </form>
-        }
-    </div>
-    <div class="search-bar-container">
-        <input type="text" placeholder="Search for books..." />
-        <button type="button">🔍</button>
-    </div>
-</nav>
+<partial name="_Header" />
 
 <div class="book-gallery">
     @foreach (var book in Model.Books)
@@ -221,10 +104,15 @@
                 }
             </div>
             <h4>@book.Title</h4>
+            <div class="book-author">
+                By @book.Author
+            </div>
+            <div class="book-price">
+                Price: @book.Price.ToString("C")
+            </div>
             <div class="book-actions">
                 <a asp-page="/ViewInfo" asp-route-id="@book.Id" class="btn">View Info</a>
                 <a asp-page="/AddToCart" asp-route-id="@book.Id" class="btn">Add to cart</a>
-                <a asp-page="/Books/Index" class="btn">Manage Books</a>
             </div>
         </div>
     }
