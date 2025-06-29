@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using PopularBookstore.Services; // Your email service namespace
+using PopularBookstore.Services; 
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -59,20 +59,13 @@ public class CreateAccountModel : PageModel
             return Page();
         }
 
-        // In a real application, you would:
-        // 1. Check if the user already exists.
-        // 2. Hash the password securely.
-        // 3. Save the user to a database (e.g., using ASP.NET Core Identity).
-
-        // For now, we'll simulate user creation and send the email.
+        //Simulate user creation and send the email.
         var subject = "Welcome to Popular Bookstore!";
         var message = $"Hello {Input.Name},<br><br>Thank you for creating an account at Popular Bookstore. We're excited to have you!<br><br>You can now log in using your email: {Input.Email}.<br><br>Best regards,<br>The Popular Bookstore Team";
         
         await _emailSender.SendEmailAsync(Input.Email, subject, message);
 
         ShowConfirmationMessage = true;
-        // Optionally clear the input model if you don't want to redisplay the data
-        // Input = new InputModel(); 
         
         return Page();
     }

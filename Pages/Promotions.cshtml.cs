@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Authorization; // Add this
+using Microsoft.AspNetCore.Authorization; 
 
-namespace PopularBookstore.Pages // Corrected namespace
+namespace PopularBookstore.Pages
 {
     [Authorize]
     public class PromotionsModel : PageModel
