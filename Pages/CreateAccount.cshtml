@@ -1,124 +1,112 @@
 @page
-@model CreateAccountModel
+@model PopularBookstore.Pages.CreateAccountModel
 @{
     ViewData["Title"] = "Create Account";
+    Layout = null; // Use a null layout for a custom page
 }
 
-<style>
-    
-    .header-container {
-        background-color: #ffe0e0; 
-        padding: 10px 20px;
-        text-align: left;
-        margin-bottom: 20px;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Popular Bookstore</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
 
-    .header-title {
-        font-size: 2em;
-        font-weight: bold;
-        color: #333;
-    }
+        .header-container {
+            background-color: #ffe0e0;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
 
-    .page-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 20px;
-        text-align: center;
-    }
+        .header-title {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
 
-    .page-main-title {
-        font-size: 2.5em;
-        font-weight: bold;
-        margin-bottom: 20px;
-        color: #333;
-    }
+        .create-account-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 40px;
+        }
 
-    .confirmation-message {
-        font-size: 1.2em;
-        color: #333;
-        margin-bottom: 30px;
-    }
+            .create-account-container h2 {
+                font-size: 2.5em;
+                font-weight: bold;
+                margin-bottom: 30px;
+            }
 
-    .form-group {
-        margin-bottom: 15px;
-        width: 350px; 
-    }
+        .form-group {
+            margin-bottom: 15px;
+            width: 350px;
+        }
 
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
 
-    .form-actions {
-        display: flex;
-        justify-content: space-around; 
-        width: 350px; 
-        margin-top: 20px;
-    }
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 350px;
+            margin-top: 20px;
+        }
 
-    .btn {
-        padding: 10px 25px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1em;
-        text-decoration: none;
-        text-align: center;
-        min-width: 100px; 
-    }
+        .btn {
+            padding: 10px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            border: 1px solid;
+        }
 
-    .btn-confirm, .btn-login {
-        background-color: #90ee90; 
-        color: #333;
-        border: 1px solid #77cc77;
-    }
+        .btn-confirm {
+            background-color: #90ee90; /* Light green */
+            border-color: #77cc77;
+            color: #333;
+        }
 
-    .btn-reset {
-        background-color: #ff6347; 
-        color: white;
-        border: 1px solid #e05030;
-    }
+        .btn-reset {
+            background-color: #ffcccb; /* Light red */
+            border-color: #ffb3b2;
+            color: #333;
+        }
 
-    .text-danger {
-        font-size: 0.9em;
-        color: red; 
-        display: block; 
-        text-align: left;
-    }
+        .text-danger {
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-title">Popular Bookstore</div>
+    </div>
 
-</style>
-
-<div class="header-container">
-    <div class="header-title">Popular Bookstore</div>
-</div>
-
-<div class="page-container">
-    <div class="page-main-title">Create Account</div>
-
-    @if (Model.ShowConfirmationMessage)
-    {
-        <div class="confirmation-message">
-            A confirmation email has been sent to your email address.
-        </div>
-        <a asp-page="/Login" class="btn btn-login">Login</a>
-    }
-    else
-    {
-        <form method="post">
+    <div class="create-account-container">
+        <h2>Create Account</h2>
+        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <input asp-for="Input.Email" class="form-control" placeholder="Enter mail" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="Input.Password" type="password" class="form-control" placeholder="Enter Password" />
+                <input asp-for="Input.Password" class="form-control" placeholder="Enter Password" />
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Re-enter Password" />
+                <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="Re-enter Password" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -134,9 +122,10 @@
                 <button type="reset" class="btn btn-reset">Reset</button>
             </div>
         </form>
-    }
-</div>
+    </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

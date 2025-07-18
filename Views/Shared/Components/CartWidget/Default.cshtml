@@ -1,0 +1,27 @@
+﻿@model int
+
+<style>
+    .cart-widget {
+        position: relative;
+        display: inline-block;
+    }
+    .cart-badge {
+        position: absolute;
+        top: -5px;
+        right: -10px;
+        padding: 2px 6px;
+        border-radius: 50%;
+        background-color: red;
+        color: white;
+        font-size: 0.7em;
+        font-weight: bold;
+    }
+</style>
+
+<a asp-page="/Cart" title="View Cart" class="cart-widget">
+    🛒
+    @if (Model > 0)
+    {
+        <span class="cart-badge">@Model</span>
+    }
+</a>

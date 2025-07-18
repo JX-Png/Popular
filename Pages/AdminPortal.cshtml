@@ -1,0 +1,160 @@
+﻿@page
+@model PopularBookstore.Pages.AdminPortalModel
+@{
+    ViewData["Title"] = "Administrator Login";
+    Layout = null;
+}
+
+<div class="login-container">
+    <h2>Administrator Login</h2>
+
+    <div class="circle-placeholder">
+        <div>Icon</div>
+    </div>
+
+    <form id="adminLoginForm" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <input asp-for="Input.Email" class="form-control" placeholder="Enter mail" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input asp-for="Input.Password" class="form-control" type="password" placeholder="Enter Password" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="form-actions">
+            <button type="button" id="showPopupBtn" class="btn btn-login">Login</button>
+        </div>
+    </form>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <p>You are logging in as an administrator. You can manage user accounts and add items in the management settings.</p>
+        <button id="confirmLoginBtn" class="confirm-button">Confirm</button>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+    }
+
+        .login-container h2 {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+    .circle-placeholder {
+        width: 150px;
+        height: 150px;
+        border: 2px solid #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        font-size: 24px;
+        color: #777;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        width: 350px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        width: 350px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        text-decoration: none;
+        border: 1px solid;
+    }
+
+    .btn-login {
+        background-color: #90ee90;
+        border-color: #77cc77;
+        color: #333;
+        width: 100%;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        text-align: center;
+        border-radius: 10px;
+    }
+
+    .confirm-button {
+        background-color: #90ee90;
+        border: 1px solid #77cc77;
+        color: #333;
+        padding: 10px 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-top: 20px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var modal = document.getElementById('confirmationModal');
+            var showPopupBtn = document.getElementById('showPopupBtn');
+            var confirmLoginBtn = document.getElementById('confirmLoginBtn');
+            var adminLoginForm = document.getElementById('adminLoginForm');
+
+            showPopupBtn.onclick = function () {
+                modal.style.display = 'block';
+            }
+
+            confirmLoginBtn.onclick = function () {
+                adminLoginForm.submit();
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        });
+    </script>
+}

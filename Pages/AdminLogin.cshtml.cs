@@ -8,13 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace PopularBookstore.Pages
 {
-    public class LoginModel : PageModel
+    // Remove the Route attribute to avoid ambiguity
+    public class AdminLoginModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<LoginModel> _logger;
+        private readonly ILogger<AdminLoginModel> _logger;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<LoginModel> logger)
+        public AdminLoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<AdminLoginModel> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -38,9 +39,6 @@ namespace PopularBookstore.Pages
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
-
-            [Display(Name = "Remember me?")]
-            public bool RememberMe { get; set; }
         }
 
         public async Task OnGetAsync(string? returnUrl = null)
@@ -51,10 +49,7 @@ namespace PopularBookstore.Pages
             }
 
             returnUrl ??= Url.Content("~/");
-
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
             ReturnUrl = returnUrl;
         }
 
@@ -64,12 +59,21 @@ namespace PopularBookstore.Pages
 
             if (ModelState.IsValid)
             {
-                // To enhance security, we use a generic error message for failed logins.
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, false, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        _logger.LogInformation("Administrator logged in.");
+                        return LocalRedirect(returnUrl);
+                    }
+                    else
+                    {
+                        await _signInManager.SignOutAsync();
+                        ModelState.AddModelError(string.Empty, "You do not have administrative privileges.");
+                        return Page();
+                    }
                 }
                 if (result.IsLockedOut)
                 {
@@ -83,7 +87,6 @@ namespace PopularBookstore.Pages
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
     }

@@ -1,4 +1,8 @@
-﻿<style>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<style>
     .main-header-container {
         background-color: #ffe0e0;
         padding: 15px 25px;
@@ -14,15 +18,10 @@
         color: #333;
     }
 
-    .cart-icon-area a {
+    .cart-icon-area {
         font-size: 2.5em;
         color: #555;
-        text-decoration: none;
     }
-
-        .cart-icon-area a::before {
-            content: "🛒";
-        }
 
     .nav-bar {
         background-color: #f8f9fa;
@@ -89,12 +88,20 @@
             .search-bar-container button:hover {
                 background-color: #0056b3;
             }
+
+    .admin-login-link {
+        font-size: 0.9em;
+        color: #555;
+        display: block;
+        text-align: right;
+        padding: 5px 0;
+    }
 </style>
 
 <div class="main-header-container">
     <div class="main-header-title">Popular Bookstore</div>
     <div class="cart-icon-area">
-        <a asp-page="/Cart" title="View Cart"></a>
+        @await Component.InvokeAsync("CartWidget")
     </div>
 </div>
 
@@ -102,19 +109,29 @@
     <div class="nav-links">
         <a asp-page="/Index">Home</a>
         <a asp-page="/Promotions">Promotions</a>
-        <a asp-page="/Profile">Profile</a>
-        <a asp-page="/Settings">Settings</a>
-        <a asp-page="/OrderHistory">Order History</a>
-        <a asp-page="/Books/Index">Manage Books</a>
-        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        @if (SignInManager.IsSignedIn(User))
         {
-            <form asp-page="/Logout" method="post">
-                <button type="submit" class="nav-link-button">Logout</button>
-            </form>
+            <a asp-page="/Profile">Profile</a>
+            <a asp-page="/Settings">Settings</a>
+            <a asp-page="/OrderHistory">Order History</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-page="/Books/Index">Manage Books</a>
+            }
         }
+        <partial name="_LoginPartial" />
     </div>
     <div class="search-bar-container">
-        <input type="text" placeholder="Search for books..." />
-        <button type="button">🔍</button>
+        <form method="get" asp-page="/Search">
+            <input type="text" name="SearchTerm" placeholder="Search for books..." />
+            <button type="submit">🔍</button>
+        </form>
     </div>
 </nav>
+
+@if (!SignInManager.IsSignedIn(User))
+{
+    <div style="text-align: right; padding: 0 25px 10px;">
+        <a href="/AdminPortal" class="admin-login-link">Administrator Login</a>
+    </div>
+}

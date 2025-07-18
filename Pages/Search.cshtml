@@ -1,18 +1,25 @@
 ﻿@page
-@model PopularBookstore.Pages.IndexModel
+@model PopularBookstore.Pages.SearchModel
 @using System
 @{
-    ViewData["Title"] = "Homepage";
+    ViewData["Title"] = "Search Results";
 }
 
 <style>
-    /* --- Existing Styles --- */
+    /* --- Styles for Search Results (similar to Index) --- */
+    .search-results-container {
+        padding: 20px;
+    }
+
+    .search-results-header {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
     .book-gallery {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 25px;
-        padding: 25px;
-        background-color: #fff;
     }
 
     .book-card {
@@ -64,7 +71,7 @@
         display: flex;
         justify-content: center;
         gap: 5px;
-        margin-top: auto; /* Pushes buttons to the bottom */
+        margin-top: auto;
     }
 
         .book-actions .btn {
@@ -81,13 +88,9 @@
             text-align: center;
         }
 
-            .book-actions .btn:hover {
-                background-color: #e0e0e0;
-            }
-
     /* --- Modal Popup Styles --- */
     .modal {
-        display: none; /* Hidden by default */
+        display: none;
         position: fixed;
         z-index: 1000;
         left: 0;
@@ -95,7 +98,7 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        background-color: rgba(0,0,0,0.5);
     }
 
     .modal-content {
@@ -118,10 +121,6 @@
         font-weight: bold;
         cursor: pointer;
     }
-
-        .close-button:hover, .close-button:focus {
-            color: black;
-        }
 
     .modal-body {
         display: flex;
@@ -181,39 +180,50 @@
 
 <partial name="_Header" />
 
-<div class="book-gallery">
-    @foreach (var book in Model.Books)
+<div class="search-results-container">
+    <h2 class="search-results-header">Search Results for: "@Model.SearchTerm"</h2>
+
+    @if (Model.Books.Any())
     {
-        <div class="book-card">
-            <div>
-                <div class="book-image-placeholder">
-                    @if (book.ImageData != null && book.ImageMimeType != null)
-                    {
-                        <img src="data:@book.ImageMimeType;base64,@Convert.ToBase64String(book.ImageData)" alt="@book.Title" />
-                    }
-                    else if (!string.IsNullOrEmpty(book.ImageUrl))
-                    {
-                        <img src="@book.ImageUrl" alt="@book.Title" />
-                    }
+        <div class="book-gallery">
+            @foreach (var book in Model.Books)
+            {
+                <div class="book-card">
+                    <div>
+                        <div class="book-image-placeholder">
+                            @if (book.ImageData != null && book.ImageMimeType != null)
+                            {
+                                <img src="data:@book.ImageMimeType;base64,@Convert.ToBase64String(book.ImageData)" alt="@book.Title" />
+                            }
+                            else if (!string.IsNullOrEmpty(book.ImageUrl))
+                            {
+                                <img src="@book.ImageUrl" alt="@book.Title" />
+                            }
+                        </div>
+                        <h4>@book.Title</h4>
+                        <div class="author">By @book.Author</div>
+                        <div class="price">@book.Price.ToString("C")</div>
+                    </div>
+                    <div class="book-actions">
+                        <button class="btn view-info-btn"
+                                data-title="@book.Title"
+                                data-author="@book.Author"
+                                data-price="@book.Price.ToString("C")"
+                                data-genre="@book.Genre"
+                                data-description="@book.Description"
+                                data-image-src="@(book.ImageData != null ? $"data:{book.ImageMimeType};base64,{Convert.ToBase64String(book.ImageData)}" : book.ImageUrl)"
+                                data-cart-url="@Url.Page("/Cart", "AddToCart", new { id = book.Id })">
+                            View Info
+                        </button>
+                        <a asp-page="/Cart" asp-page-handler="AddToCart" asp-route-id="@book.Id" class="btn">Add to cart</a>
+                    </div>
                 </div>
-                <h4>@book.Title</h4>
-                <div class="author">By @book.Author</div>
-                <div class="price">@book.Price.ToString("C")</div>
-            </div>
-            <div class="book-actions">
-                <button class="btn view-info-btn"
-                        data-title="@book.Title"
-                        data-author="@book.Author"
-                        data-price="@book.Price.ToString("C")"
-                        data-genre="@book.Genre"
-                        data-description="@book.Description"
-                        data-image-src="@(book.ImageData != null ? $"data:{book.ImageMimeType};base64,{Convert.ToBase64String(book.ImageData)}" : book.ImageUrl)"
-                        data-cart-url="@Url.Page("/Cart", "AddToCart", new { id = book.Id })">
-                    View Info
-                </button>
-                <a asp-page="/Cart" asp-page-handler="AddToCart" asp-route-id="@book.Id" class="btn">Add to cart</a>
-            </div>
+            }
         </div>
+    }
+    else
+    {
+        <p>No books found matching your search term.</p>
     }
 </div>
 
@@ -241,12 +251,12 @@
 
 @section Scripts {
     <script>
+        // This is the same script from Index.cshtml to handle the modal popup
         document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('book-details-modal');
             const closeButton = document.querySelector('.close-button');
             const viewInfoButtons = document.querySelectorAll('.view-info-btn');
 
-            // Function to open the modal and populate it with data
             function openModal(data) {
                 document.getElementById('modal-book-image').src = data.imageSrc;
                 document.getElementById('modal-book-title').textContent = data.title;
@@ -258,7 +268,6 @@
                 modal.style.display = 'block';
             }
 
-            // Add click event to all "View Info" buttons
             viewInfoButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const bookData = {
@@ -274,12 +283,10 @@
                 });
             });
 
-            // Function to close the modal
             function closeModal() {
                 modal.style.display = 'none';
             }
 
-            // Event listeners for closing the modal
             closeButton.addEventListener('click', closeModal);
             window.addEventListener('click', function (event) {
                 if (event.target == modal) {

@@ -2,137 +2,156 @@
 @model LoginModel
 @{
     ViewData["Title"] = "Login";
+    Layout = null; // Use a null layout to have a completely custom page
 }
 
-<style>
-    .header-container {
-        background-color: #ffe0e0; /* Light pink background */
-        padding: 10px 20px;
-        text-align: left;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Popular Bookstore</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
 
-    .header-title {
-        font-size: 2em;
-        font-weight: bold;
-        color: #333;
-    }
+        .header-container {
+            background-color: #ffe0e0; /* Light pink background */
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
 
-    .admin-login-link {
-        font-size: 0.9em;
-        color: #007bff;
-        text-decoration: none;
-    }
+        .header-title {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
 
-    .admin-login-link:hover {
-        text-decoration: underline;
-    }
+        .admin-login-link {
+            font-size: 0.9em;
+            color: #007bff;
+            text-decoration: none;
+        }
 
-    .login-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding-top: 20px;
-    }
+            .admin-login-link:hover {
+                text-decoration: underline;
+            }
 
-    .icon-placeholder {
-        width: 150px;
-        height: 150px;
-        border: 2px solid black;
-        border-radius: 50%; /* Makes it a circle */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 30px;
-        font-size: 1.2em;
-        color: #666;
-    }
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 40px;
+        }
 
-    .form-group {
-        margin-bottom: 15px;
-        width: 300px; /* Adjust as needed */
-    }
+        .icon-placeholder {
+            width: 150px;
+            height: 150px;
+            border: 2px solid black;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            color: #666;
+        }
 
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box; /* Ensures padding doesn't affect overall width */
-    }
+        .form-group {
+            margin-bottom: 15px;
+            width: 300px;
+        }
 
-    .login-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 300px; /* Match form-group width */
-        margin-top: 10px;
-    }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
 
-    .btn {
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1em;
-        text-decoration: none;
-        text-align: center;
-    }
+        .login-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 300px;
+            margin-top: 10px;
+        }
 
-    .btn-login {
-        background-color: #90ee90; /* Light green */
-        color: #333;
-        border: 1px solid #77cc77;
-    }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            text-align: center;
+            border: 1px solid;
+        }
 
-    .btn-create-account {
-        background-color: #ffe0b2; 
-        color: #333;
-        border: 1px solid #ffcc80;
-    }
+        .btn-login {
+            background-color: #90ee90; /* Light green */
+            border-color: #77cc77;
+            color: #333;
+        }
 
-    .forgot-password-link {
-        font-size: 0.9em;
-        color: #007bff;
-        text-decoration: none;
-        display: block; 
-        text-align: left; 
-        width: 300px; 
-        margin-bottom: 20px; 
-    }
+        .btn-create-account {
+            background-color: #ffe0b2; /* Light orange/yellow */
+            border-color: #ffcc80;
+            color: #333;
+        }
 
-    .forgot-password-link:hover {
-        text-decoration: underline;
-    }
+        .forgot-password-link {
+            font-size: 0.9em;
+            color: #007bff;
+            text-decoration: none;
+            display: block;
+            width: 300px;
+            margin-bottom: 20px;
+        }
 
-</style>
-
-<div class="header-container">
-    <div class="header-title">Popular Bookstore</div>
-    <a href="/AdminLogin" class="admin-login-link">Administrator Login</a>
-</div>
-
-<div class="login-container">
-    <div class="icon-placeholder">
-        Icon
+        .text-danger {
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-title">Popular Bookstore</div>
+        <a href="/AdminLogin" class="admin-login-link">Administrator Login</a>
     </div>
 
-    <form method="post">
-        <div class="form-group">
-            <input type="email" class="form-control" id="email" name="Email" placeholder="Enter mail" required />
+    <div class="login-container">
+        <div class="icon-placeholder">
+            Icon
         </div>
-        <div class="form-group">
-            <input type="password" class="form-control" id="password" name="Password" placeholder="Enter Password" required />
-        </div>
-        <div>
-            <a href="#" class="forgot-password-link">Forget password?</a>
-        </div>
-        <div class="login-actions">
-            <button type="submit" class="btn btn-login">Login</button>
-            <a href="/CreateAccount" class="btn btn-create-account">Create Account</a>
-        </div>
-    </form>
-</div>
+
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="Input.Email" class="form-control" placeholder="Enter mail" required />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="Input.Password" class="form-control" placeholder="Enter Password" required />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div>
+                <a href="#" class="forgot-password-link">Forget password?</a>
+            </div>
+            <div class="login-actions">
+                <button type="submit" class="btn btn-login">Login</button>
+                <a asp-page="/CreateAccount" class="btn btn-create-account">Create Account</a>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

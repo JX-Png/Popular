@@ -1,11 +1,111 @@
 ﻿@page
-@model PopularBookstore.Pages.OrderHistoryModel
+@model PopularBookstore.Pages.CartModel
+@using System
 @{
-    ViewData["Title"] = "Cart";
+    ViewData["Title"] = "My Cart";
 }
 
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>The contents of your shopping cart will be displayed here.</p>
-    <p><a asp-page="/Index">Continue Shopping</a></p>
+<style>
+    .cart-container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #fff;
+    }
+
+    .cart-item-image {
+        flex: 0 0 100px;
+        margin-right: 20px;
+    }
+
+        .cart-item-image img {
+            width: 100%;
+            height: auto;
+        }
+
+    .cart-item-details {
+        flex-grow: 1;
+    }
+
+        .cart-item-details h5 {
+            margin: 0;
+        }
+
+    .cart-item-actions {
+        text-align: right;
+    }
+
+    .remove-btn {
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+    .cart-summary {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .checkout-btn {
+        padding: 10px 25px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+</style>
+
+<partial name="_Header" />
+
+<div class="cart-container">
+    <h2>@ViewData["Title"]</h2>
+    <a href="javascript:history.back()">&lt; Back</a>
+
+    <hr />
+
+    @if (Model.CartItems.Any())
+    {
+        @foreach (var item in Model.CartItems)
+        {
+            <div class="cart-item">
+                <div class="cart-item-image">
+                    @if (item.ImageData != null && item.ImageMimeType != null)
+                    {
+                        <img src="data:@item.ImageMimeType;base64,@Convert.ToBase64String(item.ImageData)" alt="@item.Title" />
+                    }
+                    else
+                    {
+                        <div style="width:100px; height:120px; background-color:#e9ecef; text-align:center; line-height:120px;">No Image</div>
+                    }
+                </div>
+                <div class="cart-item-details">
+                    <h5>@item.Title</h5>
+                    <p>Qty: @item.Quantity</p>
+                </div>
+                <div class="cart-item-actions">
+                    <p><strong>@((item.Price * item.Quantity).ToString("C"))</strong></p>
+                    <form method="post" asp-page-handler="RemoveFromCart">
+                        <input type="hidden" name="id" value="@item.BookId" />
+                        <button type="submit" class="remove-btn" style="background:none; border:none; cursor:pointer;">Remove</button>
+                    </form>
+                </div>
+            </div>
+        }
+
+        <div class="cart-summary">
+            <h4>Total: @Model.TotalCost.ToString("C")</h4>
+            <a href="/Checkout" class="checkout-btn">Checkout</a>
+        </div>
+    }
+    else
+    {
+        <p>Your cart is empty.</p>
+    }
 </div>

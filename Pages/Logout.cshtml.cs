@@ -1,28 +1,32 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
-namespace PopularBookstore.Pages // Ensure this namespace matches your project
+namespace PopularBookstore.Pages
 {
-    [AllowAnonymous] // Allow even unauthenticated users to reach this to perform logout
     public class LogoutModel : PageModel
     {
-        // This handler is called when the form (with the logout button) is POSTed.
-        public async Task<IActionResult> OnPostAsync()
+        private readonly SignInManager<IdentityUser> _signInManager;
+
+        public LogoutModel(SignInManager<IdentityUser> signInManager)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToPage("/Login"); // Redirect to the login page after logout
+            _signInManager = signInManager;
         }
 
-        // Optional: Handle GET requests to /Logout, perhaps by redirecting or showing a message.
-        // For a button-triggered logout, OnPostAsync is the primary concern.
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnPost(string returnUrl = null)
         {
-            // If you want to prevent direct GET access or handle it differently:
-            return RedirectToPage("/Index"); // Or RedirectToPage("/Login");
+            await _signInManager.SignOutAsync();
+            if (returnUrl != null)
+            {
+                return LocalRedirect(returnUrl);
+            }
+            else
+            {
+                // This needs to be a redirect so that the browser performs a new
+                // request and the identity for the user gets updated.
+                return RedirectToPage("/Index");
+            }
         }
     }
 }
