@@ -1,30 +1,37 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PopularBookstore.ViewModels;
+using PopularBookstore.Services;
+using PopularBookstore.ViewModels; 
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
-namespace WebApplication1.ViewComponents
+namespace PopularBookstore.ViewComponents
 {
     public class CartWidgetViewComponent : ViewComponent
     {
-        private const string CartCookieKey = "MyCart";
+        private readonly CartService _cartService;
+
+        public CartWidgetViewComponent(CartService cartService)
+        {
+            _cartService = cartService;
+        }
 
         public IViewComponentResult Invoke()
         {
-            var totalItems = 0;
-            var cookieValue = Request.Cookies[CartCookieKey];
+            var cartCookieName = _cartService.GetCartCookieName();
+            var cartJson = Request.Cookies[cartCookieName];
+            var cartItemCount = 0;
 
-            if (!string.IsNullOrEmpty(cookieValue))
+            if (!string.IsNullOrEmpty(cartJson))
             {
-                var items = JsonSerializer.Deserialize<List<CartCookieItem>>(cookieValue);
-                if (items != null)
+                var cart = JsonSerializer.Deserialize<List<CartCookieItem>>(cartJson);
+                if (cart != null)
                 {
-                    totalItems = items.Sum(item => item.Quantity);
+                    cartItemCount = cart.Sum(item => item.Quantity);
                 }
             }
 
-            return View(totalItems);
+            return View(cartItemCount);
         }
     }
 }

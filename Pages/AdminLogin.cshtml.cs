@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace PopularBookstore.Pages
 {
-    // Remove the Route attribute to avoid ambiguity
     public class AdminLoginModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -55,15 +54,21 @@ namespace PopularBookstore.Pages
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content("~/Index"); // Redirect to the main homepage on success
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, false, lockoutOnFailure: false);
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "The credentials provided are invalid.");
+                    return Page();
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(user, Input.Password, false, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
-                    if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
                     {
                         _logger.LogInformation("Administrator logged in.");
                         return LocalRedirect(returnUrl);

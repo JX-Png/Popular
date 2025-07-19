@@ -24,7 +24,7 @@ namespace WebApplication1.Models // Or PopularBookstore.Models if you've changed
         public string? Genre { get; set; } 
 
         [StringLength(500)]
-        public string? Description { get; set; } // Add this property
+        public string? Description { get; set; } 
 
         public string? ImageUrl { get; set; }
 

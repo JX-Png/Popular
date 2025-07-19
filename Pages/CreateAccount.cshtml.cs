@@ -80,7 +80,7 @@ namespace PopularBookstore.Pages
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            // If something failed, redisplay form
             return Page();
         }
     }

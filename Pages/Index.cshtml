@@ -6,7 +6,7 @@
 }
 
 <style>
-    /* --- Existing Styles --- */
+
     .book-gallery {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -25,7 +25,14 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
     }
+
+        /* Hover effect for the book card */
+        .book-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
 
         .book-card h4 {
             font-size: 1.1em;
@@ -83,6 +90,15 @@
 
             .book-actions .btn:hover {
                 background-color: #e0e0e0;
+            }
+
+        .book-actions form {
+            flex: 1;
+            display: flex;
+        }
+
+            .book-actions form .btn {
+                width: 100%;
             }
 
     /* --- Modal Popup Styles --- */
@@ -211,7 +227,10 @@
                         data-cart-url="@Url.Page("/Cart", "AddToCart", new { id = book.Id })">
                     View Info
                 </button>
-                <a asp-page="/Cart" asp-page-handler="AddToCart" asp-route-id="@book.Id" class="btn">Add to cart</a>
+                <form method="post" asp-page-handler="AddToCart">
+                    <input type="hidden" name="id" value="@book.Id" />
+                    <button type="submit" class="btn">Add to cart</button>
+                </form>
             </div>
         </div>
     }

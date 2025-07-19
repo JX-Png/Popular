@@ -3,8 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PopularBookstore.Services;
 using WebApplication1.Data;
+using WebApplication1.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -17,7 +21,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // Add Identity services with support for Roles
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+
+    // Relax password requirements for development
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+})
     .AddRoles<IdentityRole>() // This is crucial for role management
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -36,12 +51,8 @@ builder.Services.AddRazorPages(options =>
     // Allow anonymous access to login-related pages
     options.Conventions.AllowAnonymousToPage("/Login");
     options.Conventions.AllowAnonymousToPage("/CreateAccount");
-
-    // New admin portal page - ensure it's accessible without login
+    options.Conventions.AllowAnonymousToPage("/AdminLogin");
     options.Conventions.AllowAnonymousToPage("/AdminPortal");
-
-    // Remove any custom route mappings that might cause conflicts
-    // No longer using: options.Conventions.AddPageRoute("/AdminLogin", "/admin/login");
 });
 
 builder.Services.AddAuthorization(options =>
@@ -50,6 +61,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddTransient<IEmailSender, MessageSender>();
+builder.Services.AddScoped<CartService>();
 
 var app = builder.Build();
 
@@ -59,7 +71,16 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    await SeedAdminUser(userManager, roleManager);
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        await SeedAdminUser(userManager, roleManager, logger);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while seeding the admin user.");
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -73,14 +94,6 @@ else
     app.UseDeveloperExceptionPage();
 }
 
-// Add logging middleware to see all requests - helpful for debugging routing issues
-app.Use(async (context, next) =>
-{
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation($"Request Path: {context.Request.Path}");
-    await next.Invoke();
-});
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -93,29 +106,100 @@ app.MapRazorPages();
 
 app.Run();
 
-async Task SeedAdminUser(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+async Task SeedAdminUser(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ILogger logger)
 {
     const string adminRole = "Admin";
     const string adminEmail = "admin@example.com";
     const string adminPassword = "admin123!";
 
-    if (!await roleManager.RoleExistsAsync(adminRole))
-    {
-        await roleManager.CreateAsync(new IdentityRole(adminRole));
-    }
+    logger.LogInformation("Starting admin user seeding process...");
 
-    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    try
     {
-        var user = new IdentityUser
+        // Check and create Admin role
+        if (!await roleManager.RoleExistsAsync(adminRole))
         {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
-        var result = await userManager.CreateAsync(user, adminPassword);
-        if (result.Succeeded)
+            logger.LogInformation("Creating Admin role...");
+            var roleResult = await roleManager.CreateAsync(new IdentityRole(adminRole));
+            if (roleResult.Succeeded)
+            {
+                logger.LogInformation("Admin role created successfully.");
+            }
+            else
+            {
+                logger.LogError("Failed to create Admin role: {Errors}",
+                    string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                return;
+            }
+        }
+        else
         {
-            await userManager.AddToRoleAsync(user, adminRole);
+            logger.LogInformation("Admin role already exists.");
+        }
+
+        // Check if admin user exists
+        var existingUser = await userManager.FindByEmailAsync(adminEmail);
+        if (existingUser == null)
+        {
+            logger.LogInformation("Creating admin user: {Email}", adminEmail);
+            var user = new IdentityUser
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
+            var createResult = await userManager.CreateAsync(user, adminPassword);
+            if (createResult.Succeeded)
+            {
+                logger.LogInformation("Admin user created successfully.");
+
+                var roleResult = await userManager.AddToRoleAsync(user, adminRole);
+                if (roleResult.Succeeded)
+                {
+                    logger.LogInformation("Admin role assigned to user successfully.");
+                }
+                else
+                {
+                    logger.LogError("Failed to assign Admin role to user: {Errors}",
+                        string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                }
+            }
+            else
+            {
+                logger.LogError("Failed to create admin user: {Errors}",
+                    string.Join(", ", createResult.Errors.Select(e => e.Description)));
+            }
+        }
+        else
+        {
+            logger.LogInformation("Admin user already exists: {Email}", adminEmail);
+
+            var hasAdminRole = await userManager.IsInRoleAsync(existingUser, adminRole);
+            if (!hasAdminRole)
+            {
+                logger.LogInformation("Adding Admin role to existing user...");
+                var roleResult = await userManager.AddToRoleAsync(existingUser, adminRole);
+                if (roleResult.Succeeded)
+                {
+                    logger.LogInformation("Admin role assigned to existing user successfully.");
+                }
+                else
+                {
+                    logger.LogError("Failed to assign Admin role to existing user: {Errors}",
+                        string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                }
+            }
+            else
+            {
+                logger.LogInformation("User already has Admin role.");
+            }
         }
     }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Exception occurred during admin user seeding.");
+    }
+
+    logger.LogInformation("Admin user seeding process completed.");
 }

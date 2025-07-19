@@ -1,0 +1,15 @@
+﻿@page
+@model PopularBookstore.Pages.AccessDeniedModel
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<partial name="_Header" />
+
+<div class="text-center" style="padding: 50px;">
+    <h1 class="display-4" style="color: #dc3545;">Access Denied</h1>
+    <p class="lead" style="margin-top: 20px;">You do not have permission to view this page.</p>
+    <hr />
+    <p>Please contact the administrator if you believe this is an error.</p>
+    <a asp-page="/Index" class="btn btn-primary" style="margin-top: 20px;">Return to Homepage</a>
+</div>
