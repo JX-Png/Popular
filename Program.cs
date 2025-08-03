@@ -21,7 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // Add Identity services with support for Roles
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 
@@ -46,7 +46,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizePage("/Index");
-    options.Conventions.AuthorizePage("/Books/Index", "AdminOnly");
+    // Apply AdminOnly policy to the entire Books folder
+    options.Conventions.AuthorizeFolder("/Books", "AdminOnly");
 
     // Allow anonymous access to login-related pages
     options.Conventions.AllowAnonymousToPage("/Login");
@@ -63,13 +64,16 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddTransient<IEmailSender, MessageSender>();
 builder.Services.AddScoped<CartService>();
 
+//Payment card encryption service
+builder.Services.AddScoped<CardEncryptionService>();
+
 var app = builder.Build();
 
 // Seed the database with the admin user
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var logger = services.GetRequiredService<ILogger<Program>>();
 
@@ -106,7 +110,7 @@ app.MapRazorPages();
 
 app.Run();
 
-async Task SeedAdminUser(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ILogger logger)
+async Task SeedAdminUser(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger logger)
 {
     const string adminRole = "Admin";
     const string adminEmail = "admin@example.com";
@@ -142,11 +146,13 @@ async Task SeedAdminUser(UserManager<IdentityUser> userManager, RoleManager<Iden
         if (existingUser == null)
         {
             logger.LogInformation("Creating admin user: {Email}", adminEmail);
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                Name = "Admin",
+                Address = "N/A"
             };
 
             var createResult = await userManager.CreateAsync(user, adminPassword);

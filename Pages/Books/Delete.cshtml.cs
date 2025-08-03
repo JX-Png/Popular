@@ -1,32 +1,39 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using WebApplication1.Data;
 using WebApplication1.Models;
-using System.Linq;
 
-public class BooksDeleteModel : PageModel
+namespace PopularBookstore.Pages.Books
 {
-    private readonly ApplicationDbContext _context;
-    public BooksDeleteModel(ApplicationDbContext context) => _context = context;
+    [Authorize(Roles = "Admin")]
 
-    [BindProperty]
-    public Book Book { get; set; }
-
-    public IActionResult OnGet(int id)
+    public class BooksDeleteModel : PageModel
     {
-        Book = _context.Books.FirstOrDefault(b => b.Id == id);
-        if (Book == null) return RedirectToPage("Index");
-        return Page();
-    }
+        private readonly ApplicationDbContext _context;
+        public BooksDeleteModel(ApplicationDbContext context) => _context = context;
 
-    public IActionResult OnPost()
-    {
-        var bookInDb = _context.Books.FirstOrDefault(b => b.Id == Book.Id);
-        if (bookInDb != null)
+        [BindProperty]
+        public Book Book { get; set; }
+
+        public IActionResult OnGet(int id)
         {
-            _context.Books.Remove(bookInDb);
-            _context.SaveChanges();
+            Book = _context.Books.FirstOrDefault(b => b.Id == id);
+            if (Book == null) return RedirectToPage("Index");
+            return Page();
         }
-        return RedirectToPage("Index");
+
+        public IActionResult OnPost()
+        {
+            var bookInDb = _context.Books.FirstOrDefault(b => b.Id == Book.Id);
+            if (bookInDb != null)
+            {
+                _context.Books.Remove(bookInDb);
+                _context.SaveChanges();
+            }
+            return RedirectToPage("Index");
+        }
     }
 }

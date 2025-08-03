@@ -6,10 +6,61 @@
 
 <partial name="_Header" />
 
-<div class="text-center" style="padding: 50px;">
-    <h1 class="display-4" style="color: #dc3545;">Access Denied</h1>
-    <p class="lead" style="margin-top: 20px;">You do not have permission to view this page.</p>
-    <hr />
-    <p>Please contact the administrator if you believe this is an error.</p>
-    <a asp-page="/Index" class="btn btn-primary" style="margin-top: 20px;">Return to Homepage</a>
+<style>
+    .access-denied-container {
+        max-width: 600px;
+        margin: 100px auto;
+        text-align: center;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .access-denied-icon {
+        font-size: 64px;
+        color: #e74c3c;
+        margin-bottom: 20px;
+    }
+
+    .access-denied-title {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .access-denied-message {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .access-denied-button {
+        display: inline-block;
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+    .access-denied-button:hover {
+        background-color: #2980b9;
+        text-decoration: none;
+        color: white;
+    }
+</style>
+
+<div class="access-denied-container">
+    <div class="access-denied-icon">
+        <i class="fas fa-lock"></i>
+    </div>
+    <h1 class="access-denied-title">Access Denied</h1>
+    <p class="access-denied-message">
+        Sorry, you don't have permission to access this area.
+        Please contact your administrators if you think this is an error.
+    </p>
+    <a href="/" class="access-denied-button">Return to Homepage</a>
 </div>

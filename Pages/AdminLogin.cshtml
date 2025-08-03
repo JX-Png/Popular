@@ -56,17 +56,12 @@
                 margin-bottom: 30px;
             }
 
-        .icon-placeholder {
+        .logo-image {
             width: 150px;
             height: 150px;
-            border: 2px solid black;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             margin-bottom: 30px;
-            font-size: 1.2em;
-            color: #666;
+            object-fit: contain;
         }
 
         .form-group {
@@ -155,9 +150,7 @@
     <div class="login-container">
         <h2>Administrator Login</h2>
 
-        <div class="icon-placeholder">
-            Icon
-        </div>
+        <img src="~/Images/Logo.png" alt="Popular Bookstore Logo" class="logo-image" asp-append-version="true" />
 
         <form id="adminLoginForm" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

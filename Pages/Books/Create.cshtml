@@ -1,54 +1,209 @@
 ﻿@page
 @model PopularBookstore.Pages.Books.CreateModel
-
 @{
-    ViewData["Title"] = "Add Book";
+    ViewData["Title"] = "Create Book";
 }
 
 <partial name="_Header" />
 
-<h2>Add Book</h2>
+<style>
+    .books-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-<form method="post" enctype="multipart/form-data">
-    <div>
-        <label asp-for="Book.Title"></label>
-        <input asp-for="Book.Title" />
-        <span asp-validation-for="Book.Title"></span>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 15px;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin: 0;
+    }
+
+    .back-link {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+    .validation-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .file-upload {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-file-upload {
+        display: inline-block;
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 24px;
+        cursor: pointer;
+        border-radius: 4px;
+        margin-top: 10px;
+        text-align: center;
+        transition: background-color 0.2s;
+        font-size: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .custom-file-upload:hover {
+            background-color: #45a049;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+
+    .file-name {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    #ImageUpload {
+        display: none;
+    }
+</style>
+
+<div class="books-container">
+    <div class="page-header">
+        <h2 class="page-title">Create New Book</h2>
+        <a asp-page="Index" class="back-link">← Back to Books</a>
     </div>
 
-    <div>
-        <label asp-for="Book.Author"></label>
-        <input asp-for="Book.Author" />
-        <span asp-validation-for="Book.Author"></span>
-    </div>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label asp-for="Book.Title" class="form-label">Title</label>
+            <input asp-for="Book.Title" class="form-control" />
+            <span asp-validation-for="Book.Title" class="validation-message"></span>
+        </div>
 
-    <div>
-        <label asp-for="Book.Price"></label>
-        <input asp-for="Book.Price" type="number" step="0.01" />
-        <span asp-validation-for="Book.Price"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="Book.Author" class="form-label">Author</label>
+            <input asp-for="Book.Author" class="form-control" />
+            <span asp-validation-for="Book.Author" class="validation-message"></span>
+        </div>
 
-    <div>
-        <label asp-for="Book.Genre"></label>
-        <input asp-for="Book.Genre" />
-        <span asp-validation-for="Book.Genre"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="Book.Description" class="form-label">Description</label>
+            <textarea asp-for="Book.Description" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Book.Description" class="validation-message"></span>
+        </div>
 
-    <div>
-        <label asp-for="Book.Description"></label>
-        <textarea asp-for="Book.Description" rows="4"></textarea>
-        <span asp-validation-for="Book.Description"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="Book.Price" class="form-label">Price (SGD)</label>
+            <input asp-for="Book.Price" class="form-control" />
+            <span asp-validation-for="Book.Price" class="validation-message"></span>
+        </div>
 
-    <div>
-        <label for="ImageFile">Book Cover Image</label>
-        <input type="file" id="ImageFile" name="ImageFile" accept="image/*" />
-    </div>
+        <div class="form-group">
+            <label asp-for="Book.Genre" class="form-label">Genre</label>
+            <input asp-for="Book.Genre" class="form-control" />
+            <span asp-validation-for="Book.Genre" class="validation-message"></span>
+        </div>
 
-    <button type="submit">Add</button>
-    <a asp-page="Index">Cancel</a>
-</form>
+        <div class="form-group">
+            <label class="form-label">Book Cover</label>
+            <div class="file-upload">
+                <label for="ImageUpload" class="custom-file-upload">
+                    Upload Book Cover
+                </label>
+                <input asp-for="UploadedImage" type="file" id="ImageUpload" accept="image/*" />
+                <div id="fileName" class="file-name"></div>
+            </div>
+            <span asp-validation-for="UploadedImage" class="validation-message"></span>
+        </div>
+
+        <div class="form-actions">
+            <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Create Book</button>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Display selected file name
+        document.getElementById('ImageUpload').addEventListener('change', function() {
+            var fileName = this.files[0]?.name || 'No file chosen';
+            document.getElementById('fileName').textContent = fileName;
+        });
+    </script>
 }

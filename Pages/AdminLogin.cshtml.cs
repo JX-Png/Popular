@@ -5,16 +5,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using WebApplication1.Models; // Add this namespace for ApplicationUser
 
 namespace PopularBookstore.Pages
 {
     public class AdminLoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager; // Changed from IdentityUser
+        private readonly UserManager<ApplicationUser> _userManager; // Changed from IdentityUser
         private readonly ILogger<AdminLoginModel> _logger;
 
-        public AdminLoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<AdminLoginModel> logger)
+        public AdminLoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AdminLoginModel> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;

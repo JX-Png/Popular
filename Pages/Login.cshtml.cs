@@ -10,16 +10,17 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using PopularBookstore.Services;
 using PopularBookstore.ViewModels;
+using WebApplication1.Models; // Add this namespace
 
 namespace PopularBookstore.Pages
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager; // Changed from IdentityUser
         private readonly ILogger<LoginModel> _logger;
         private readonly CartService _cartService;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, CartService cartService)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, CartService cartService)
         {
             _signInManager = signInManager;
             _logger = logger;

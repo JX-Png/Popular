@@ -7,29 +7,90 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffe0e0;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background image as an actual image element */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        /* Fallback background color */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffe0e0;
+            z-index: -3;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <partial name="_Header" />
-    </header>
+    <!-- Fallback background color layer -->
+    <div class="background-overlay"></div>
 
-    <div class="container">
-        <main role="main" class="pb-3">
+    <!-- Background image as an IMG tag instead of CSS, updated to JPG -->
+    <img src="~/Images/background.jpg" class="background-image" alt=""
+         onerror="this.onerror=null; this.src='/background.jpg';" />
 
-            @RenderBody()
-        </main>
-    </div>
+    <div class="main-container">
+        <header>
+            <partial name="_Header" />
+        </header>
 
-    <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Popular Bookstore
+            <main role="main" class="content-container">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2025 - Popular Bookstore
+            </div>
+        </footer>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

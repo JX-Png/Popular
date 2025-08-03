@@ -4,18 +4,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using WebApplication1.Models;
 
 namespace PopularBookstore.Pages
 {
     public class CreateAccountModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<CreateAccountModel> _logger;
 
         public CreateAccountModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             ILogger<CreateAccountModel> logger)
         {
             _userManager = userManager;
@@ -65,7 +66,13 @@ namespace PopularBookstore.Pages
             returnUrl ??= Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    Name = Input.Name,
+                    Address = Input.Address
+                };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -80,7 +87,7 @@ namespace PopularBookstore.Pages
                 }
             }
 
-            // If something failed, redisplay form
+            // If we got this far, something failed, redisplay form
             return Page();
         }
     }

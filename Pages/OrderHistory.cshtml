@@ -6,9 +6,312 @@
 
 <partial name="_Header" />
 
+<style>
+    .order-history-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>A list of past orders will be displayed here.</p>
-    <p><a asp-page="/Index">Back to Homepage</a></p>
+    .order-box {
+        border: 2px solid #ffe0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #fff9f9;
+        position: relative;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .order-status {
+        font-weight: bold;
+        color: #d35400;
+    }
+
+    .status-completed {
+        color: #27ae60;
+    }
+
+    .status-processing {
+        color: #3498db;
+    }
+
+    .status-shipping {
+        color: #f39c12;
+    }
+
+    .status-cancelled {
+        color: #e74c3c;
+    }
+
+    .order-date {
+        color: #666;
+        font-size: 0.9em;
+    }
+
+    .book-list {
+        display: flex;
+        margin-bottom: 15px;
+    }
+
+    .book-icon {
+        width: 50px;
+        height: 65px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+    }
+
+        .book-icon img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+    .order-amount {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .order-actions {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px; /* Creates spacing between buttons */
+    }
+
+    .view-details-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+        .view-details-btn:hover {
+            background-color: #0056b3;
+            text-decoration: none;
+            color: white;
+        }
+
+    .cancel-order-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.9em;
+        cursor: pointer;
+    }
+
+        .cancel-order-btn:hover {
+            background-color: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+    .no-orders {
+        text-align: center;
+        padding: 50px 0;
+        color: #666;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        border-radius: 5px;
+        width: 400px;
+        max-width: 80%;
+        text-align: center;
+    }
+
+    .modal-actions {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-confirm {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .btn-confirm:hover {
+            background-color: #c82333;
+        }
+
+    .btn-decline {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .btn-decline:hover {
+            background-color: #5a6268;
+        }
+
+    .alert {
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+
+<div class="order-history-container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="no-orders">
+            <p>You haven't placed any orders yet.</p>
+            <a asp-page="/Index">Continue shopping</a>
+        </div>
+    }
+    else
+    {
+        @foreach (var order in Model.Orders)
+        {
+            <div class="order-box">
+                <div class="order-header">
+                    <div>
+                        <div class="order-status @("status-" + order.Status.ToLower())">
+                            Status: @order.Status
+                        </div>
+                        <div class="order-date">
+                            Ordered on: @order.OrderDate.ToString("MM/dd/yyyy")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="book-list">
+                    @foreach (var item in order.OrderItems.Take(3))
+                    {
+                        <div class="book-icon">
+                            @if (item.Book.ImageData != null && item.Book.ImageMimeType != null)
+                            {
+                                <img src="data:@item.Book.ImageMimeType;base64,@Convert.ToBase64String(item.Book.ImageData)" alt="@item.Book.Title" />
+                            }
+                            else if (!string.IsNullOrEmpty(item.Book.ImageUrl))
+                            {
+                                <img src="@item.Book.ImageUrl" alt="@item.Book.Title" />
+                            }
+                            else
+                            {
+                                <span>📖</span>
+                            }
+                        </div>
+                    }
+                    @if (order.OrderItems.Count > 3)
+                    {
+                        <div class="book-icon">+@(order.OrderItems.Count - 3)</div>
+                    }
+                </div>
+
+                <div class="order-amount">Total: @order.TotalAmount.ToString("C")</div>
+
+                <div class="order-actions">
+                    @if (order.Status.Equals("Processing", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <button type="button" class="cancel-order-btn" onclick="showCancelModal(@order.Id)">Cancel Order</button>
+                    }
+                    <a asp-page="/OrderDetails" asp-route-id="@order.Id" class="view-details-btn">Order Details</a>
+                </div>
+            </div>
+        }
+
+        <!-- Cancel Order Confirmation Modal -->
+        <div id="cancelOrderModal" class="modal">
+            <div class="modal-content">
+                <h3>Are you sure you want to cancel your order?</h3>
+                <p>This action cannot be undone.</p>
+                <div class="modal-actions">
+                    <form method="post">
+                        <input type="hidden" id="cancelOrderId" name="orderId" />
+                        <button type="submit" class="btn-confirm" asp-page-handler="CancelOrder">Yes</button>
+                    </form>
+                    <button type="button" class="btn-decline" onclick="hideCancelModal()">No</button>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+<script>
+    function showCancelModal(orderId) {
+        document.getElementById("cancelOrderId").value = orderId;
+        document.getElementById("cancelOrderModal").style.display = "block";
+    }
+
+    function hideCancelModal() {
+        document.getElementById("cancelOrderModal").style.display = "none";
+    }
+
+    // Close modal if user clicks outside of it
+    window.onclick = function(event) {
+        var modal = document.getElementById("cancelOrderModal");
+        if (event.target == modal) {
+            hideCancelModal();
+        }
+    }
+</script>

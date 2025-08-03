@@ -1,15 +1,29 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using WebApplication1.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .header-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
     .main-header-container {
+        width: 100%;
         background-color: #ffe0e0;
         padding: 15px 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0;
+        margin: 0;
+        box-sizing: border-box;
     }
 
     .main-header-title {
@@ -24,12 +38,14 @@
     }
 
     .nav-bar {
+        width: 100%;
         background-color: #f8f9fa;
         padding: 10px 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #ddd;
+        box-sizing: border-box;
     }
 
     .nav-links {
@@ -96,42 +112,52 @@
         text-align: right;
         padding: 5px 0;
     }
+
+    .admin-login-container {
+        width: 100%;
+        text-align: right;
+        padding: 0 25px 10px;
+        background-color: #f8f9fa;
+        box-sizing: border-box;
+    }
 </style>
 
-<div class="main-header-container">
-    <div class="main-header-title">Popular Bookstore</div>
-    <div class="cart-icon-area">
-        @await Component.InvokeAsync("CartWidget")
+<div class="header-wrapper">
+    <div class="main-header-container">
+        <div class="main-header-title">Popular Bookstore</div>
+        <div class="cart-icon-area">
+            @await Component.InvokeAsync("CartWidget")
+        </div>
     </div>
-</div>
 
-<nav class="nav-bar">
-    <div class="nav-links">
-        <a asp-page="/Index">Home</a>
-        <a asp-page="/Promotions">Promotions</a>
-        @if (SignInManager.IsSignedIn(User))
-        {
-            <a asp-page="/Profile">Profile</a>
-            <a asp-page="/Settings">Settings</a>
-            <a asp-page="/OrderHistory">Order History</a>
-            @if (User.IsInRole("Admin"))
+    <nav class="nav-bar">
+        <div class="nav-links">
+            <a asp-page="/Index">Home</a>
+            <a asp-page="/Promotions">Promotions</a>
+            @if (SignInManager.IsSignedIn(User))
             {
-                <a asp-page="/Books/Index">Manage Books</a>
+                <a asp-page="/Profile">Profile</a>
+                <a asp-page="/Settings">Settings</a>
+                <a asp-page="/OrderHistory">Order History</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-page="/Books/Index">Manage Books</a>
+                }
             }
-        }
-        <partial name="_LoginPartial" />
-    </div>
-    <div class="search-bar-container">
-        <form method="get" asp-page="/Search">
-            <input type="text" name="SearchTerm" placeholder="Search for books..." />
-            <button type="submit">🔍</button>
-        </form>
-    </div>
-</nav>
+            <partial name="_LoginPartial" />
+        </div>
+        <div class="search-bar-container">
+            <form method="get" asp-page="/Search">
+                <input type="text" name="SearchTerm" placeholder="Search for books..." />
+                <button type="submit">🔍</button>
+            </form>
+        </div>
+    </nav>
 
-@if (!SignInManager.IsSignedIn(User))
-{
-    <div style="text-align: right; padding: 0 25px 10px;">
-        <a href="/AdminPortal" class="admin-login-link">Administrator Login</a>
-    </div>
-}
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <div class="admin-login-container">
+            <a href="/AdminPortal" class="admin-login-link">Administrator Login</a>
+        </div>
+    }
+</div>

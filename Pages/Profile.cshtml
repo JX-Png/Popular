@@ -1,14 +1,120 @@
 ﻿@page
-@model PopularBookstore.Pages.OrderHistoryModel
+@model PopularBookstore.Pages.ProfileModel
 @{
     ViewData["Title"] = "Profile";
 }
 
 <partial name="_Header" />
 
+<style>
+    .profile-container {
+        border: 2px solid #ffe0e0;
+        border-radius: 8px;
+        padding: 25px;
+        background-color: #fff9f9;
+        max-width: 600px;
+        margin: 2rem auto;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>User profile information and settings will be managed here.</p>
-    <p><a asp-page="/Index">Back to Homepage</a></p>
+    .profile-form-group {
+        margin-bottom: 1rem;
+    }
+
+        .profile-form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: .5rem;
+        }
+
+        .profile-form-group input,
+        .profile-form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f9fa; /* Initially appear disabled */
+        }
+
+    .profile-actions {
+        text-align: right;
+        margin-top: 1.5rem;
+    }
+
+        .profile-actions .btn {
+            margin-left: 0.5rem;
+        }
+</style>
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="profile-container">
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-success" role="alert">
+                @Model.StatusMessage
+            </div>
+        }
+        <form id="profile-form" method="post">
+            <div class="profile-form-group">
+                <label asp-for="Input.Name"></label>
+                <input asp-for="Input.Name" class="form-control" readonly />
+            </div>
+            <div class="profile-form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" readonly />
+            </div>
+            <div class="profile-form-group">
+                <label asp-for="Input.Address"></label>
+                <textarea asp-for="Input.Address" class="form-control" rows="4" readonly></textarea>
+            </div>
+
+            <div class="profile-actions">
+                <button id="edit-profile-button" type="button" class="btn btn-primary">Edit Profile</button>
+                <button id="save-changes-button" type="submit" class="btn btn-success" style="display:none;">Save Changes</button>
+                <button id="cancel-button" type="button" class="btn btn-secondary" style="display:none;">Cancel</button>
+            </div>
+        </form>
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('profile-form');
+            const editButton = document.getElementById('edit-profile-button');
+            const saveButton = document.getElementById('save-changes-button');
+            const cancelButton = document.getElementById('cancel-button');
+            const fields = form.querySelectorAll('input, textarea');
+
+            let originalValues = {};
+
+            function toggleEditMode(isEditing) {
+                fields.forEach(field => {
+                    field.readOnly = !isEditing;
+                    field.style.backgroundColor = isEditing ? '#fff' : '#f8f9fa';
+                    if (isEditing) {
+                        originalValues[field.name] = field.value;
+                    }
+                });
+
+                editButton.style.display = isEditing ? 'none' : 'inline-block';
+                saveButton.style.display = isEditing ? 'inline-block' : 'none';
+                cancelButton.style.display = isEditing ? 'inline-block' : 'none';
+            }
+
+            editButton.addEventListener('click', function () {
+                toggleEditMode(true);
+            });
+
+            cancelButton.addEventListener('click', function () {
+                fields.forEach(field => {
+                    field.value = originalValues[field.name];
+                });
+                toggleEditMode(false);
+            });
+        });
+    </script>
+}

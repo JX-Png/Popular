@@ -7,44 +7,168 @@
 
 <partial name="_Header" />
 
-<h2>Books</h2>
-<p>
-    <a asp-page="Create">Add New Book</a>
-</p>
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Price (SGD)</th>
-            <th>Genre</th>
-            <th>Image</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model.Books)
-        {
-            <tr>
-                <td>@book.Title</td>
-                <td>@book.Author</td>
-                <td>@book.Price.ToString("C")</td>
-                <td>@book.Genre</td>
-                <td>
-                    @if (book.ImageData != null && book.ImageMimeType != null)
-                    {
-                        <img src="data:@book.ImageMimeType;base64,@Convert.ToBase64String(book.ImageData)" alt="@book.Title" width="50" />
-                    }
-                    else if (!string.IsNullOrEmpty(book.ImageUrl))
-                    {
-                        <img src="@book.ImageUrl" alt="@book.Title" width="50" />
-                    }
-                </td>
-                <td>
-                    <a asp-page="Edit" asp-route-id="@book.Id">Edit</a> |
-                    <a asp-page="Delete" asp-route-id="@book.Id">Delete</a>
-                </td>
-            </tr>
+<style>
+    .books-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 15px;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin: 0;
+    }
+
+    .add-new-link {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+        .add-new-link:hover {
+            background-color: #45a049;
+            text-decoration: none;
+            color: white;
         }
-    </tbody>
-</table>
+
+    .books-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+        .books-table th {
+            background-color: #f5f5f5;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .books-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .books-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .books-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+    .book-image {
+        width: 50px;
+        height: 75px;
+        object-fit: cover;
+        border-radius: 3px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .action-links a {
+        display: inline-block;
+        padding: 6px 10px;
+        margin-right: 5px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .edit-link {
+        background-color: #3498db;
+    }
+
+        .edit-link:hover {
+            background-color: #2980b9;
+            text-decoration: none;
+            color: white;
+        }
+
+    .delete-link {
+        background-color: #e74c3c;
+    }
+
+        .delete-link:hover {
+            background-color: #c0392b;
+            text-decoration: none;
+            color: white;
+        }
+
+    .genre-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        border-radius: 12px;
+        background-color: #e9ecef;
+        color: #495057;
+    }
+</style>
+
+<div class="books-container">
+    <div class="page-header">
+        <h2 class="page-title">Books</h2>
+        <a asp-page="Create" class="add-new-link">Add New Book</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="books-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Price (SGD)</th>
+                    <th>Genre</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model.Books)
+                {
+                    <tr>
+                        <td>@book.Title</td>
+                        <td>@book.Author</td>
+                        <td>@book.Price.ToString("C")</td>
+                        <td><span class="genre-badge">@book.Genre</span></td>
+                        <td>
+                            @if (book.ImageData != null && book.ImageMimeType != null)
+                            {
+                                <img src="data:@book.ImageMimeType;base64,@Convert.ToBase64String(book.ImageData)" alt="@book.Title" class="book-image" />
+                            }
+                            else if (!string.IsNullOrEmpty(book.ImageUrl))
+                            {
+                                <img src="@book.ImageUrl" alt="@book.Title" class="book-image" />
+                            }
+                        </td>
+                        <td class="action-links">
+                            <a asp-page="Edit" asp-route-id="@book.Id" class="edit-link">Edit</a>
+                            <a asp-page="Delete" asp-route-id="@book.Id" class="delete-link">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
