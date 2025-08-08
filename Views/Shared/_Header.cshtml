@@ -136,7 +136,6 @@
             <a asp-page="/Promotions">Promotions</a>
             @if (SignInManager.IsSignedIn(User))
             {
-                <a asp-page="/Profile">Profile</a>
                 <a asp-page="/Settings">Settings</a>
                 <a asp-page="/OrderHistory">Order History</a>
                 @if (User.IsInRole("Admin"))

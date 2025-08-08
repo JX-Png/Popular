@@ -18,16 +18,48 @@ namespace PopularBookstore.Pages
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly CardEncryptionService _cardEncryptionService;
 
         public SettingsModel(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             CardEncryptionService cardEncryptionService)
         {
             _context = context;
             _userManager = userManager;
+            _signInManager = signInManager;
             _cardEncryptionService = cardEncryptionService;
+        }
+
+        [BindProperty]
+        public InputModel Input { get; set; }
+
+        [BindProperty]
+        public CardInputModel CardInput { get; set; } = new CardInputModel();
+
+        public List<PaymentCard> UserCards { get; set; } = new List<PaymentCard>();
+
+        [TempData]
+        public string StatusMessage { get; set; }
+
+        public int? EditCardId { get; set; }
+
+        public class InputModel
+        {
+            [Required]
+            [Display(Name = "Name")]
+            public string Name { get; set; }
+
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
+
+            [Required]
+            [Display(Name = "Delivery Address")]
+            public string Address { get; set; }
         }
 
         public class CardInputModel
@@ -59,15 +91,24 @@ namespace PopularBookstore.Pages
             public bool IsDefault { get; set; }
         }
 
-        [BindProperty]
-        public CardInputModel CardInput { get; set; } = new CardInputModel();
+        private async Task LoadCurrentUserAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            Input = new InputModel
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Address = user.Address
+            };
+        }
 
-        public List<PaymentCard> UserCards { get; set; } = new List<PaymentCard>();
-
-        [TempData]
-        public string StatusMessage { get; set; }
-
-        public int? EditCardId { get; set; }
+        private async Task LoadUserCards(string userId)
+        {
+            UserCards = await _context.PaymentCards
+                .Where(c => c.UserId == userId)
+                .OrderByDescending(c => c.IsDefault)
+                .ToListAsync();
+        }
 
         public async Task<IActionResult> OnGetAsync(int? editId)
         {
@@ -77,6 +118,12 @@ namespace PopularBookstore.Pages
             }
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            await LoadCurrentUserAsync();
             await LoadUserCards(user.Id);
 
             if (editId.HasValue)
@@ -99,6 +146,56 @@ namespace PopularBookstore.Pages
             return Page();
         }
 
+        public async Task<IActionResult> OnPostUpdateProfileAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadCurrentUserAsync();
+                await LoadUserCards(user.Id);
+                return Page();
+            }
+
+            // Update Name and Address
+            user.Name = Input.Name;
+            user.Address = Input.Address;
+
+            // Update Email and UserName if changed
+            var email = await _userManager.GetEmailAsync(user);
+            if (Input.Email != email)
+            {
+                var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
+                if (!setEmailResult.Succeeded)
+                {
+                    StatusMessage = "Error: Unexpected error when trying to set email.";
+                    return RedirectToPage();
+                }
+
+                var setUserNameResult = await _userManager.SetUserNameAsync(user, Input.Email);
+                if (!setUserNameResult.Succeeded)
+                {
+                    StatusMessage = "Error: Unexpected error when trying to set user name.";
+                    return RedirectToPage();
+                }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                StatusMessage = "Error: Unexpected error when trying to update profile.";
+                return RedirectToPage();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "Your profile has been updated";
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnPostAddCardAsync()
         {
             if (!User.Identity.IsAuthenticated)
@@ -106,14 +203,14 @@ namespace PopularBookstore.Pages
                 return RedirectToPage("/Login");
             }
 
+            var user = await _userManager.GetUserAsync(User);
+
             if (!ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
+                await LoadCurrentUserAsync();
                 await LoadUserCards(user.Id);
                 return Page();
             }
-
-            var currentUser = await _userManager.GetUserAsync(User);
 
             // Encrypt card number
             var encryptedCardNumber = _cardEncryptionService.EncryptCardNumber(CardInput.CardNumber);
@@ -126,7 +223,7 @@ namespace PopularBookstore.Pages
             if (setAsDefault)
             {
                 var defaultCards = await _context.PaymentCards
-                    .Where(c => c.UserId == currentUser.Id && c.IsDefault)
+                    .Where(c => c.UserId == user.Id && c.IsDefault)
                     .ToListAsync();
 
                 foreach (var card in defaultCards)
@@ -138,7 +235,7 @@ namespace PopularBookstore.Pages
             // Create new card
             var newCard = new PaymentCard
             {
-                UserId = currentUser.Id,
+                UserId = user.Id,
                 CardName = CardInput.CardName,
                 CardNumberHash = encryptedCardNumber,
                 CardholderName = CardInput.CardholderName,
@@ -173,6 +270,7 @@ namespace PopularBookstore.Pages
 
             if (!ModelState.IsValid)
             {
+                await LoadCurrentUserAsync();
                 await LoadUserCards(user.Id);
                 EditCardId = cardId;
                 return Page();
@@ -258,14 +356,6 @@ namespace PopularBookstore.Pages
 
             StatusMessage = "Default payment method updated.";
             return RedirectToPage();
-        }
-
-        private async Task LoadUserCards(string userId)
-        {
-            UserCards = await _context.PaymentCards
-                .Where(c => c.UserId == userId)
-                .OrderByDescending(c => c.IsDefault)
-                .ToListAsync();
         }
     }
 }
